@@ -42,10 +42,14 @@
  * Interaction:  pressing the s and e keys (shoulder and elbow)
  * alters the rotation of the robot arm.
  */
+#include <GL/freeglut_std.h>
+#include <GL/gl.h>
 #include <GL/glut.h>
 #include <stdlib.h>
 
-static int shoulder = 0, elbow = 0;
+static int shoulder = 0;
+static int elbow = 0;
+static int base = 0;
 
 void init(void) {
   glClearColor(0.0, 0.0, 0.0, 0.0);
@@ -54,6 +58,21 @@ void init(void) {
 
 void display(void) {
   glClear(GL_COLOR_BUFFER_BIT);
+
+  // OUTER: entire robot arm
+  glPushMatrix();
+  glTranslatef(-2.0, -1.0, 0.0); // <-- add this to reposition base + arm
+  // Draw base platform (drawn before rotation so it stays in place)
+  glPushMatrix();
+  glScalef(2.6, 0.1, 2.6);
+  glutWireCube(1.0);
+  glPopMatrix();
+
+  // Base rotation around Y + translate up to shoulder pivot
+  glRotatef((GLfloat)base, 0.0, 1.0, 0.0);
+  glTranslatef(0.0, 0.15, 0.0);
+
+  // Shoulder
   glPushMatrix();
   glTranslatef(-1.0, 0.0, 0.0);
   glRotatef((GLfloat)shoulder, 0.0, 0.0, 1.0);
@@ -63,6 +82,7 @@ void display(void) {
   glutWireCube(1.0);
   glPopMatrix();
 
+  // Elbow
   glTranslatef(1.0, 0.0, 0.0);
   glRotatef((GLfloat)elbow, 0.0, 0.0, 1.0);
   glTranslatef(1.0, 0.0, 0.0);
@@ -71,7 +91,8 @@ void display(void) {
   glutWireCube(1.0);
   glPopMatrix();
 
-  glPopMatrix();
+  glPopMatrix(); // end shoulder/elbow
+  glPopMatrix(); // end base/outer
   glutSwapBuffers();
 }
 
@@ -82,11 +103,24 @@ void reshape(int w, int h) {
   gluPerspective(65.0, (GLfloat)w / (GLfloat)h, 1.0, 20.0);
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
-  glTranslatef(0.0, 0.0, -5.0);
+
+  // 0. Change perspective
+  // glTranslatef(0.0, 0.0, -8.0); // swapped out to change orientation
+  gluLookAt(3.0, 2.0, 8.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
 }
 
 void keyboard(unsigned char key, int x, int y) {
   switch (key) {
+  // Base movement
+  case 'b':
+    base = (base + 5) % 360;
+    glutPostRedisplay();
+    break;
+  case 'B':
+    base = (base - 5) % 360;
+    glutPostRedisplay();
+    break;
+  // Shoulder movement
   case 's':
     shoulder = (shoulder + 5) % 360;
     glutPostRedisplay();
@@ -95,6 +129,7 @@ void keyboard(unsigned char key, int x, int y) {
     shoulder = (shoulder - 5) % 360;
     glutPostRedisplay();
     break;
+  // Elbow movement
   case 'e':
     elbow = (elbow + 5) % 360;
     glutPostRedisplay();
