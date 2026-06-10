@@ -46,7 +46,6 @@
 #include <GL/gl.h>
 #include <GL/glut.h>
 #include <math.h>
-#include <stdlib.h>
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
@@ -57,6 +56,7 @@ static int elbow = -30;
 static int base = 0;
 static int forearm = 0;
 static int wrist = 0;
+static int pincer = 0;
 
 void init(void) {
   glClearColor(0.0, 0.0, 0.0, 0.0);
@@ -87,7 +87,7 @@ void display(void) {
   glRotatef((GLfloat)shoulder, 0.0, 0.0, 1.0);
   glTranslatef(1.0, 0.0, 0.0);
   glPushMatrix();
-  glScalef(2.0, 0.4, 1.0);
+  glScalef(2.0, 0.4, 0.4);
   glutWireCube(1.0);
   glPopMatrix();
 
@@ -99,15 +99,15 @@ void display(void) {
   // Forearm self-rotation (spins in place around its own center)
   glRotatef((GLfloat)forearm, 1.0, 0.0, 0.0);
   glPushMatrix();
-  glScalef(2.0, 0.4, 1.0);
+  glScalef(2.0, 0.4, 0.4);
   glutWireCube(1.0);
   glPopMatrix();
 
   // Move to wrist joint, then rotate, then offset hand
   glTranslatef(1.0, 0.0, 0.0);              // to end of forearm (wrist joint)
   glRotatef((GLfloat)wrist, 0.0, 0.0, 1.0); // wrist rotation at joint
-  glTranslatef(0.6, 0.0, 0.0);              // offset to center hand
-  float r = 0.5, d = 0.4;
+  glTranslatef(0.5, 0.0, 0.0);              // offset to center hand
+  float r = 0.5, d = 0.1;
   int i;
 
   // Front face semicircle
@@ -147,38 +147,42 @@ void display(void) {
   }
   glEnd();
 
-  // Upper pincer finger (base open, tip curves inward)
+  // Upper pincer finger
   glPushMatrix();
   glTranslatef(0.0f, 0.4f, 0.0f);
+  glRotatef(-(GLfloat)pincer, 0.0f, 0.0f, 1.0f);
+  glPushMatrix();
   glRotatef(20.0f, 0.0f, 0.0f, 1.0f);
   glTranslatef(0.3f, 0.0f, 0.0f);
   glScalef(0.6f, 0.15f, 0.15f);
   glutWireCube(1.0);
   glPopMatrix();
-
   glPushMatrix();
-  glTranslatef(0.55f, 0.55f, 0.0f);
+  glTranslatef(0.564f, 0.205f, 0.0f);
   glRotatef(-30.0f, 0.0f, 0.0f, 1.0f);
   glTranslatef(0.25f, 0.0f, 0.0f);
   glScalef(0.5f, 0.15f, 0.15f);
   glutWireCube(1.0);
   glPopMatrix();
+  glPopMatrix();
 
-  // Lower pincer finger (base open, tip curves inward)
+  // Lower pincer finger
   glPushMatrix();
   glTranslatef(0.0f, -0.4f, 0.0f);
+  glRotatef((GLfloat)pincer, 0.0f, 0.0f, 1.0f);
+  glPushMatrix();
   glRotatef(-20.0f, 0.0f, 0.0f, 1.0f);
   glTranslatef(0.3f, 0.0f, 0.0f);
   glScalef(0.6f, 0.15f, 0.15f);
   glutWireCube(1.0);
   glPopMatrix();
-
   glPushMatrix();
-  glTranslatef(0.55f, -0.55f, 0.0f);
+  glTranslatef(0.564f, -0.205f, 0.0f);
   glRotatef(30.0f, 0.0f, 0.0f, 1.0f);
   glTranslatef(0.25f, 0.0f, 0.0f);
   glScalef(0.5f, 0.15f, 0.15f);
   glutWireCube(1.0);
+  glPopMatrix();
   glPopMatrix();
 
   glPopMatrix(); // end shoulder/elbow
@@ -244,6 +248,17 @@ void keyboard(unsigned char key, int x, int y) {
     break;
   case 'W':
     wrist = (wrist - 5) % 360;
+    glutPostRedisplay();
+    break;
+  // Pincer close / open
+  case 'p':
+    if (pincer < 20)
+      pincer += 5;
+    glutPostRedisplay();
+    break;
+  case 'P':
+    if (pincer > -70)
+      pincer -= 5;
     glutPostRedisplay();
     break;
   case 27:
