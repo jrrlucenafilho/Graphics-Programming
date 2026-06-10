@@ -50,6 +50,7 @@
 static int shoulder = 55;
 static int elbow = -30;
 static int base = 0;
+static int forearm = 0;
 
 void init(void) {
   glClearColor(0.0, 0.0, 0.0, 0.0);
@@ -86,6 +87,8 @@ void display(void) {
   glTranslatef(1.0, 0.0, 0.0);
   glRotatef((GLfloat)elbow, 0.0, 0.0, 1.0);
   glTranslatef(1.0, 0.0, 0.0);
+  // Forearm self-rotation (spins in place around its own center)
+  glRotatef((GLfloat)forearm, 1.0, 0.0, 0.0);
   glPushMatrix();
   glScalef(2.0, 0.4, 1.0);
   glutWireCube(1.0);
@@ -138,10 +141,16 @@ void keyboard(unsigned char key, int x, int y) {
     elbow = (elbow - 5) % 360;
     glutPostRedisplay();
     break;
-  case 27:
-    exit(0);
+  // Forearm self-rotation
+  case 'r':
+    forearm = (forearm + 5) % 360;
+    glutPostRedisplay();
     break;
-  default:
+  case 'R':
+    forearm = (forearm - 5) % 360;
+    glutPostRedisplay();
+    break;
+  case 27:
     break;
   }
 }
