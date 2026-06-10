@@ -59,16 +59,16 @@ void init(void) {
 void display(void) {
   glClear(GL_COLOR_BUFFER_BIT);
 
-  // OUTER: entire robot arm
+  // Draw base platform independently
   glPushMatrix();
-  glTranslatef(-2.0, -1.0, 0.0); // <-- add this to reposition base + arm
-  // Draw base platform (drawn before rotation so it stays in place)
-  glPushMatrix();
-  glScalef(2.6, 0.1, 2.6);
+  glTranslatef(-2.5, -0.8, 0.0);
+  glScalef(2.1, 0.3, 2.0);
   glutWireCube(1.0);
   glPopMatrix();
 
   // Base rotation around Y + translate up to shoulder pivot
+  glPushMatrix();
+  glTranslatef(-2.0, -1.0, 0.0);
   glRotatef((GLfloat)base, 0.0, 1.0, 0.0);
   glTranslatef(0.0, 0.15, 0.0);
 
@@ -92,7 +92,7 @@ void display(void) {
   glPopMatrix();
 
   glPopMatrix(); // end shoulder/elbow
-  glPopMatrix(); // end base/outer
+  glPopMatrix(); // end base rotation + arm position
   glutSwapBuffers();
 }
 
