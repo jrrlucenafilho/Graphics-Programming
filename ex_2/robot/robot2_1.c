@@ -47,8 +47,8 @@
 #include <GL/glut.h>
 #include <stdlib.h>
 
-static int shoulder = 0;
-static int elbow = 0;
+static int shoulder = 55;
+static int elbow = -30;
 static int base = 0;
 
 void init(void) {
@@ -69,7 +69,7 @@ void display(void) {
   glPopMatrix();
 
   // Move to shoulder joint (where arm meets the base)
-  glTranslatef(-1.0, -0.2, 0.0);
+  glTranslatef(-0.4, -0.2, 0.0);
   // Base rotation around Y to rotate around shoulder joint
   glRotatef((GLfloat)base, 0.0, 1.0, 0.0);
 
