@@ -57,10 +57,11 @@ static int pincer = 0;
 void init(void) {
   glClearColor(0.0, 0.0, 0.0, 0.0);
   glShadeModel(GL_FLAT);
+  glEnable(GL_DEPTH_TEST);
 }
 
 void display(void) {
-  glClear(GL_COLOR_BUFFER_BIT);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   // Outer: entire robot arm
   glPushMatrix();
@@ -69,6 +70,9 @@ void display(void) {
   // Draw base platform (drawn before rotation so it stays in place)
   glPushMatrix();
   glScalef(2.1, 0.3, 2.0);
+  glColor3f(0.3f, 0.3f, 0.3f);
+  glutSolidCube(1.0);
+  glColor3f(1.0, 1.0, 1.0);
   glutWireCube(1.0);
   glPopMatrix();
 
@@ -84,6 +88,9 @@ void display(void) {
   glTranslatef(1.0, 0.0, 0.0);
   glPushMatrix();
   glScalef(2.0, 0.4, 0.4);
+  glColor3f(0.5f, 0.5f, 0.5f);
+  glutSolidCube(1.0);
+  glColor3f(1.0, 1.0, 1.0);
   glutWireCube(1.0);
   glPopMatrix();
 
@@ -96,6 +103,9 @@ void display(void) {
   glRotatef((GLfloat)forearm, 1.0, 0.0, 0.0);
   glPushMatrix();
   glScalef(2.0, 0.4, 0.4);
+  glColor3f(0.5f, 0.5f, 0.5f);
+  glutSolidCube(1.0);
+  glColor3f(1.0, 1.0, 1.0);
   glutWireCube(1.0);
   glPopMatrix();
 
@@ -106,38 +116,69 @@ void display(void) {
   float r = 0.5, d = 0.1;
   int i;
 
-  // Front face semicircle
-  glBegin(GL_LINE_STRIP);
+  glColor3f(0.5f, 0.5f, 0.5f);
+
+  // Front face (filled semicircle)
+  glBegin(GL_TRIANGLE_FAN);
+  glVertex3f(0.0, 0.0, d);
   for (i = 0; i <= 20; i++) {
-    float a = i * M_PI / 20.0f;
+    float a = i * M_PI / 20.0;
     glVertex3f(-sin(a) * r, cos(a) * r, d);
   }
   glEnd();
 
-  // Back face semicircle
-  glBegin(GL_LINE_STRIP);
+  // Back face (filled semicircle)
+  glBegin(GL_TRIANGLE_FAN);
+  glVertex3f(0.0, 0.0, -d);
   for (i = 0; i <= 20; i++) {
-    float a = i * M_PI / 20.0f;
+    float a = i * M_PI / 20.0;
     glVertex3f(-sin(a) * r, cos(a) * r, -d);
   }
   glEnd();
 
-  // Flat side (straight edge) for front and back
-  glBegin(GL_LINES);
-  glVertex3f(0.0f, r, d);
-  glVertex3f(0.0f, -r, d);
-  glVertex3f(0.0f, r, -d);
-  glVertex3f(0.0f, -r, -d);
-  glVertex3f(0.0f, r, d);
-  glVertex3f(0.0f, r, -d);
-  glVertex3f(0.0f, -r, d);
-  glVertex3f(0.0f, -r, -d);
+  // Curved side wall
+  glBegin(GL_QUAD_STRIP);
+  for (i = 0; i <= 20; i++) {
+    float a = i * M_PI / 20.0;
+    float x = -sin(a) * r, y = cos(a) * r;
+    glVertex3f(x, y, d);
+    glVertex3f(x, y, -d);
+  }
   glEnd();
 
-  // Connecting lines between front and back
+  // Flat side wall
+  glBegin(GL_QUADS);
+  glVertex3f(0.0, r, d);
+  glVertex3f(0.0, -r, d);
+  glVertex3f(0.0, -r, -d);
+  glVertex3f(0.0, r, -d);
+  glEnd();
+
+  // White wireframe edges on hand
+  glColor3f(1.0, 1.0, 1.0);
+  glBegin(GL_LINE_STRIP);
+  for (i = 0; i <= 20; i++) {
+    float a = i * M_PI / 20.0;
+    glVertex3f(-sin(a) * r, cos(a) * r, d);
+  }
+  glEnd();
+  glBegin(GL_LINE_STRIP);
+  for (i = 0; i <= 20; i++) {
+    float a = i * M_PI / 20.0;
+    glVertex3f(-sin(a) * r, cos(a) * r, -d);
+  }
+  glEnd();
   glBegin(GL_LINES);
+  glVertex3f(0.0, r, d);
+  glVertex3f(0.0, -r, d);
+  glVertex3f(0.0, r, -d);
+  glVertex3f(0.0, -r, -d);
+  glVertex3f(0.0, r, d);
+  glVertex3f(0.0, r, -d);
+  glVertex3f(0.0, -r, d);
+  glVertex3f(0.0, -r, -d);
   for (i = 0; i <= 20; i += 5) {
-    float a = i * M_PI / 20.0f;
+    float a = i * M_PI / 20.0;
     glVertex3f(-sin(a) * r, cos(a) * r, d);
     glVertex3f(-sin(a) * r, cos(a) * r, -d);
   }
@@ -145,38 +186,50 @@ void display(void) {
 
   // Upper pincer finger
   glPushMatrix();
-  glTranslatef(0.0f, 0.4f, 0.0f);
-  glRotatef(-(GLfloat)pincer, 0.0f, 0.0f, 1.0f);
+  glTranslatef(0.0, 0.4f, 0.0);
+  glRotatef(-(GLfloat)pincer, 0.0, 0.0, 1.0);
   glPushMatrix();
-  glRotatef(20.0f, 0.0f, 0.0f, 1.0f);
-  glTranslatef(0.3f, 0.0f, 0.0f);
+  glRotatef(20.0, 0.0, 0.0, 1.0);
+  glTranslatef(0.3f, 0.0, 0.0);
   glScalef(0.6f, 0.15f, 0.15f);
+  glColor3f(0.35f, 0.35f, 0.35f);
+  glutSolidCube(1.0);
+  glColor3f(1.0, 1.0, 1.0);
   glutWireCube(1.0);
   glPopMatrix();
   glPushMatrix();
-  glTranslatef(0.564f, 0.205f, 0.0f);
-  glRotatef(-30.0f, 0.0f, 0.0f, 1.0f);
-  glTranslatef(0.25f, 0.0f, 0.0f);
+  glTranslatef(0.564f, 0.205f, 0.0);
+  glRotatef(-30.0, 0.0, 0.0, 1.0);
+  glTranslatef(0.25f, 0.0, 0.0);
   glScalef(0.5f, 0.15f, 0.15f);
+  glColor3f(0.35f, 0.35f, 0.35f);
+  glutSolidCube(1.0);
+  glColor3f(1.0, 1.0, 1.0);
   glutWireCube(1.0);
   glPopMatrix();
   glPopMatrix();
 
   // Lower pincer finger
   glPushMatrix();
-  glTranslatef(0.0f, -0.4f, 0.0f);
-  glRotatef((GLfloat)pincer, 0.0f, 0.0f, 1.0f);
+  glTranslatef(0.0, -0.4f, 0.0);
+  glRotatef((GLfloat)pincer, 0.0, 0.0, 1.0);
   glPushMatrix();
-  glRotatef(-20.0f, 0.0f, 0.0f, 1.0f);
-  glTranslatef(0.3f, 0.0f, 0.0f);
+  glRotatef(-20.0, 0.0, 0.0, 1.0);
+  glTranslatef(0.3f, 0.0, 0.0);
   glScalef(0.6f, 0.15f, 0.15f);
+  glColor3f(0.35f, 0.35f, 0.35f);
+  glutSolidCube(1.0);
+  glColor3f(1.0, 1.0, 1.0);
   glutWireCube(1.0);
   glPopMatrix();
   glPushMatrix();
-  glTranslatef(0.564f, -0.205f, 0.0f);
-  glRotatef(30.0f, 0.0f, 0.0f, 1.0f);
-  glTranslatef(0.25f, 0.0f, 0.0f);
+  glTranslatef(0.564f, -0.205f, 0.0);
+  glRotatef(30.0, 0.0, 0.0, 1.0);
+  glTranslatef(0.25f, 0.0, 0.0);
   glScalef(0.5f, 0.15f, 0.15f);
+  glColor3f(0.35f, 0.35f, 0.35f);
+  glutSolidCube(1.0);
+  glColor3f(1.0, 1.0, 1.0);
   glutWireCube(1.0);
   glPopMatrix();
   glPopMatrix();
