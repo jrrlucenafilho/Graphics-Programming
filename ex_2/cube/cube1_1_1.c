@@ -57,12 +57,13 @@ void display(void) {
                     /* viewing transformation  */
 
   /* Top-down view: camera directly above looking straight down. */
-  gluLookAt(0.0, 5.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0);
+  // gluLookAt(0.0, 5.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0);
 
-  /* glTranslatef(0,0,-5) produces the same effect as gluLookAt(0,0,5, 0,0,0,
-   * 0,1,0) because both move the world 5 units in -Z — the camera at (0,0,5)
-   * looking at the origin yields a view matrix identical to translating the
-   * world by -Z. */
+  glTranslatef(0,0,-5);
+  //produces the same effect as gluLookAt(0,0,5, 0,0,0,
+  //0,1,0) because both move the world 5 units in -Z — the camera at (0,0,5)
+  //looking at the origin yields a view matrix identical to translating the
+  //world by -Z
 
   glScalef(1.0, 2.0, 1.0); /* modeling transformation */
   glutWireCube(1.0);
