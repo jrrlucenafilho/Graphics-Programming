@@ -59,22 +59,22 @@ void init(void) {
 void display(void) {
   glClear(GL_COLOR_BUFFER_BIT);
 
-  // Draw base platform independently
+  // Outer: entire robot arm
   glPushMatrix();
-  glTranslatef(-2.5, -0.8, 0.0);
+  glTranslatef(-2.0, -1.0, 0.0);
+  // Draw base platform (drawn before rotation so it stays in place)
+  glPushMatrix();
   glScalef(2.1, 0.3, 2.0);
   glutWireCube(1.0);
   glPopMatrix();
 
-  // Base rotation around Y + translate up to shoulder pivot
-  glPushMatrix();
-  glTranslatef(-2.0, -1.0, 0.0);
+  // Move to shoulder joint (where arm meets the base)
+  glTranslatef(-1.0, -0.2, 0.0);
+  // Base rotation around Y to rotate around shoulder joint
   glRotatef((GLfloat)base, 0.0, 1.0, 0.0);
-  glTranslatef(0.0, 0.15, 0.0);
 
-  // Shoulder
+  // Shoulder (pivot at origin, which is the shoulder joint)
   glPushMatrix();
-  glTranslatef(-1.0, 0.0, 0.0);
   glRotatef((GLfloat)shoulder, 0.0, 0.0, 1.0);
   glTranslatef(1.0, 0.0, 0.0);
   glPushMatrix();
@@ -82,7 +82,7 @@ void display(void) {
   glutWireCube(1.0);
   glPopMatrix();
 
-  // Elbow
+  // Elbow (pivot at right edge of shoulder)
   glTranslatef(1.0, 0.0, 0.0);
   glRotatef((GLfloat)elbow, 0.0, 0.0, 1.0);
   glTranslatef(1.0, 0.0, 0.0);
@@ -92,7 +92,7 @@ void display(void) {
   glPopMatrix();
 
   glPopMatrix(); // end shoulder/elbow
-  glPopMatrix(); // end base rotation + arm position
+  glPopMatrix(); // end base/outer
   glutSwapBuffers();
 }
 
