@@ -45,12 +45,18 @@
 #include <GL/freeglut_std.h>
 #include <GL/gl.h>
 #include <GL/glut.h>
+#include <math.h>
 #include <stdlib.h>
+
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
 
 static int shoulder = 55;
 static int elbow = -30;
 static int base = 0;
 static int forearm = 0;
+static int wrist = 0;
 
 void init(void) {
   glClearColor(0.0, 0.0, 0.0, 0.0);
@@ -63,6 +69,7 @@ void display(void) {
   // Outer: entire robot arm
   glPushMatrix();
   glTranslatef(-2.0, -1.0, 0.0);
+
   // Draw base platform (drawn before rotation so it stays in place)
   glPushMatrix();
   glScalef(2.1, 0.3, 2.0);
@@ -71,6 +78,7 @@ void display(void) {
 
   // Move to shoulder joint (where arm meets the base)
   glTranslatef(-0.4, -0.2, 0.0);
+
   // Base rotation around Y to rotate around shoulder joint
   glRotatef((GLfloat)base, 0.0, 1.0, 0.0);
 
@@ -87,10 +95,89 @@ void display(void) {
   glTranslatef(1.0, 0.0, 0.0);
   glRotatef((GLfloat)elbow, 0.0, 0.0, 1.0);
   glTranslatef(1.0, 0.0, 0.0);
+
   // Forearm self-rotation (spins in place around its own center)
   glRotatef((GLfloat)forearm, 1.0, 0.0, 0.0);
   glPushMatrix();
   glScalef(2.0, 0.4, 1.0);
+  glutWireCube(1.0);
+  glPopMatrix();
+
+  // Move to wrist joint, then rotate, then offset hand
+  glTranslatef(1.0, 0.0, 0.0);              // to end of forearm (wrist joint)
+  glRotatef((GLfloat)wrist, 0.0, 0.0, 1.0); // wrist rotation at joint
+  glTranslatef(0.6, 0.0, 0.0);              // offset to center hand
+  float r = 0.5, d = 0.4;
+  int i;
+
+  // Front face semicircle
+  glBegin(GL_LINE_STRIP);
+  for (i = 0; i <= 20; i++) {
+    float a = i * M_PI / 20.0f;
+    glVertex3f(-sin(a) * r, cos(a) * r, d);
+  }
+  glEnd();
+
+  // Back face semicircle
+  glBegin(GL_LINE_STRIP);
+  for (i = 0; i <= 20; i++) {
+    float a = i * M_PI / 20.0f;
+    glVertex3f(-sin(a) * r, cos(a) * r, -d);
+  }
+  glEnd();
+
+  // Flat side (straight edge) for front and back
+  glBegin(GL_LINES);
+  glVertex3f(0.0f, r, d);
+  glVertex3f(0.0f, -r, d);
+  glVertex3f(0.0f, r, -d);
+  glVertex3f(0.0f, -r, -d);
+  glVertex3f(0.0f, r, d);
+  glVertex3f(0.0f, r, -d);
+  glVertex3f(0.0f, -r, d);
+  glVertex3f(0.0f, -r, -d);
+  glEnd();
+
+  // Connecting lines between front and back
+  glBegin(GL_LINES);
+  for (i = 0; i <= 20; i += 5) {
+    float a = i * M_PI / 20.0f;
+    glVertex3f(-sin(a) * r, cos(a) * r, d);
+    glVertex3f(-sin(a) * r, cos(a) * r, -d);
+  }
+  glEnd();
+
+  // Upper pincer finger (base open, tip curves inward)
+  glPushMatrix();
+  glTranslatef(0.0f, 0.4f, 0.0f);
+  glRotatef(20.0f, 0.0f, 0.0f, 1.0f);
+  glTranslatef(0.3f, 0.0f, 0.0f);
+  glScalef(0.6f, 0.15f, 0.15f);
+  glutWireCube(1.0);
+  glPopMatrix();
+
+  glPushMatrix();
+  glTranslatef(0.55f, 0.55f, 0.0f);
+  glRotatef(-30.0f, 0.0f, 0.0f, 1.0f);
+  glTranslatef(0.25f, 0.0f, 0.0f);
+  glScalef(0.5f, 0.15f, 0.15f);
+  glutWireCube(1.0);
+  glPopMatrix();
+
+  // Lower pincer finger (base open, tip curves inward)
+  glPushMatrix();
+  glTranslatef(0.0f, -0.4f, 0.0f);
+  glRotatef(-20.0f, 0.0f, 0.0f, 1.0f);
+  glTranslatef(0.3f, 0.0f, 0.0f);
+  glScalef(0.6f, 0.15f, 0.15f);
+  glutWireCube(1.0);
+  glPopMatrix();
+
+  glPushMatrix();
+  glTranslatef(0.55f, -0.55f, 0.0f);
+  glRotatef(30.0f, 0.0f, 0.0f, 1.0f);
+  glTranslatef(0.25f, 0.0f, 0.0f);
+  glScalef(0.5f, 0.15f, 0.15f);
   glutWireCube(1.0);
   glPopMatrix();
 
@@ -148,6 +235,15 @@ void keyboard(unsigned char key, int x, int y) {
     break;
   case 'R':
     forearm = (forearm - 5) % 360;
+    glutPostRedisplay();
+    break;
+  // Wrist rotation
+  case 'w':
+    wrist = (wrist + 5) % 360;
+    glutPostRedisplay();
+    break;
+  case 'W':
+    wrist = (wrist - 5) % 360;
     glutPostRedisplay();
     break;
   case 27:
