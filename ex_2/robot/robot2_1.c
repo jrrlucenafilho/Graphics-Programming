@@ -247,9 +247,9 @@ void reshape(int w, int h) {
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
 
-  // 0. Change perspective
+  // Change perspective
   // glTranslatef(0.0, 0.0, -8.0); // swapped out to change orientation
-  gluLookAt(3.0, 2.0, 8.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+  gluLookAt(0.0, 3.0, 8.0, -1.0, 0.0, 0.0, 0.0, 1.0, 0.0);
 }
 
 void keyboard(unsigned char key, int x, int y) {
