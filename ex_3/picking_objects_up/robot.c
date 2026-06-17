@@ -296,6 +296,15 @@ void display(void) {
   draw_open_box();
   glPopMatrix();
 
+  glPushMatrix();
+  glTranslatef(-4.5, -0.8, -1.5);
+  glScalef(0.8, 0.8, 0.8);
+  glColor3f(0.6, 0.0, 0.8);
+  glutSolidCube(1.0);
+  glColor3f(1.0, 1.0, 1.0);
+  glutWireCube(1.0);
+  glPopMatrix();
+
   glutSwapBuffers();
 }
 
