@@ -70,7 +70,6 @@ static void draw_blue_cube(void) {
 void init(void) {
   glClearColor(0.0, 0.0, 0.0, 0.0);
   glShadeModel(GL_FLAT);
-  glEnable(GL_DEPTH_TEST);
 }
 
 void display(void) {
@@ -79,7 +78,6 @@ void display(void) {
   gluLookAt(0.0, 0.0, 5.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
   glScalef(1.0, 1.0, 1.0);
 
-  // Swaps order based on blue_first ('i' key)
   if (blue_first) {
     draw_blue_cube();
     draw_red_cube();
