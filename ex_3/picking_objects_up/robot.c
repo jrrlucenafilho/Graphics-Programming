@@ -326,7 +326,7 @@ void display(void) {
 
   if (cube_grabbed) {
     glPushMatrix();
-    glTranslatef(0.0, -0.4, 0.0);
+    glTranslatef(1.0, 0.0, 0.0);
     glScalef(0.7, 0.7, 0.7);
     glColor3f(0.6, 0.0, 0.8);
     glutSolidCube(1.0);
