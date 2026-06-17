@@ -57,6 +57,7 @@ static int cube_grabbed = 0;
 static GLfloat hand_vx, hand_vy, hand_vz;
 static GLfloat view_mat[16];
 static GLfloat cube_vx, cube_vy, cube_vz;
+static GLfloat cube_world_x = -4.5, cube_world_y = -0.8, cube_world_z = -1.5;
 #define CUBE_X -4.5
 #define CUBE_Y -0.8
 #define CUBE_Z -1.5
@@ -269,16 +270,16 @@ void display(void) {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   glGetFloatv(GL_MODELVIEW_MATRIX, view_mat);
-  cube_vx = view_mat[0] * CUBE_X + view_mat[4] * CUBE_Y + view_mat[8] * CUBE_Z +
-            view_mat[12];
-  cube_vy = view_mat[1] * CUBE_X + view_mat[5] * CUBE_Y + view_mat[9] * CUBE_Z +
-            view_mat[13];
-  cube_vz = view_mat[2] * CUBE_X + view_mat[6] * CUBE_Y +
-            view_mat[10] * CUBE_Z + view_mat[14];
 
   if (!cube_grabbed) {
+    cube_vx = view_mat[0] * cube_world_x + view_mat[4] * cube_world_y +
+              view_mat[8] * cube_world_z + view_mat[12];
+    cube_vy = view_mat[1] * cube_world_x + view_mat[5] * cube_world_y +
+              view_mat[9] * cube_world_z + view_mat[13];
+    cube_vz = view_mat[2] * cube_world_x + view_mat[6] * cube_world_y +
+              view_mat[10] * cube_world_z + view_mat[14];
     glPushMatrix();
-    glTranslatef(CUBE_X, CUBE_Y, CUBE_Z);
+    glTranslatef(cube_world_x, cube_world_y, cube_world_z);
     glScalef(0.7, 0.7, 0.7);
     glColor3f(0.6, 0.0, 0.8);
     glutSolidCube(1.0);
@@ -326,7 +327,14 @@ void display(void) {
 
   if (cube_grabbed) {
     glPushMatrix();
-    glTranslatef(1.0, 0.0, 0.0);
+    glTranslatef(0.8, 0.0, 0.0);
+    {
+      GLfloat m[16];
+      glGetFloatv(GL_MODELVIEW_MATRIX, m);
+      cube_vx = m[12];
+      cube_vy = m[13];
+      cube_vz = m[14];
+    }
     glScalef(0.7, 0.7, 0.7);
     glColor3f(0.6, 0.0, 0.8);
     glutSolidCube(1.0);
@@ -423,8 +431,18 @@ void keyboard(unsigned char key, int x, int y) {
   case 'P':
     if (pincer > -70)
       pincer -= 5;
-    if (pincer <= 5)
+    if (pincer <= 5 && cube_grabbed) {
       cube_grabbed = 0;
+      cube_world_x = view_mat[0] * cube_vx + view_mat[1] * cube_vy +
+                     view_mat[2] * cube_vz -
+                     (view_mat[0] * view_mat[12] + view_mat[1] * view_mat[13] +
+                      view_mat[2] * view_mat[14]);
+      cube_world_z = view_mat[8] * cube_vx + view_mat[9] * cube_vy +
+                     view_mat[10] * cube_vz -
+                     (view_mat[8] * view_mat[12] + view_mat[9] * view_mat[13] +
+                      view_mat[10] * view_mat[14]);
+      cube_world_y = 0.0;
+    }
     glutPostRedisplay();
     break;
   case 27:
