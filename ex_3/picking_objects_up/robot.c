@@ -63,7 +63,7 @@ void init(void) {
 static void draw_base(void) {
   glPushMatrix();
   glScalef(2.1, 0.3, 2.0);
-  glColor3f(0.3f, 0.3f, 0.3f);
+  glColor3f(0.3, 0.3, 0.3);
   glutSolidCube(1.0);
   glColor3f(1.0, 1.0, 1.0);
   glutWireCube(1.0);
@@ -73,7 +73,7 @@ static void draw_base(void) {
 static void draw_shoulder(void) {
   glPushMatrix();
   glScalef(2.0, 0.4, 0.4);
-  glColor3f(0.5f, 0.5f, 0.5f);
+  glColor3f(0.5, 0.5, 0.5);
   glutSolidCube(1.0);
   glColor3f(1.0, 1.0, 1.0);
   glutWireCube(1.0);
@@ -83,7 +83,7 @@ static void draw_shoulder(void) {
 static void draw_forearm(void) {
   glPushMatrix();
   glScalef(2.0, 0.4, 0.4);
-  glColor3f(0.5f, 0.5f, 0.5f);
+  glColor3f(0.5, 0.5, 0.5);
   glutSolidCube(1.0);
   glColor3f(1.0, 1.0, 1.0);
   glutWireCube(1.0);
@@ -94,7 +94,7 @@ static void draw_hand(void) {
   float r = 0.5, d = 0.1;
   int i;
 
-  glColor3f(0.5f, 0.5f, 0.5f);
+  glColor3f(0.5, 0.5, 0.5);
 
   glBegin(GL_TRIANGLE_FAN);
   glVertex3f(0.0, 0.0, d);
@@ -160,28 +160,101 @@ static void draw_hand(void) {
 
 static void draw_pincer_finger(int sign) {
   glPushMatrix();
-  glTranslatef(0.0, (float)sign * 0.4f, 0.0);
+  glTranslatef(0.0, (float)sign * 0.4, 0.0);
   glRotatef(-(float)sign * (GLfloat)pincer, 0.0, 0.0, 1.0);
   glPushMatrix();
   glRotatef((float)sign * 20.0, 0.0, 0.0, 1.0);
-  glTranslatef(0.3f, 0.0, 0.0);
-  glScalef(0.6f, 0.15f, 0.15f);
-  glColor3f(0.35f, 0.35f, 0.35f);
+  glTranslatef(0.3, 0.0, 0.0);
+  glScalef(0.6, 0.15, 0.15);
+  glColor3f(0.35, 0.35, 0.35);
   glutSolidCube(1.0);
   glColor3f(1.0, 1.0, 1.0);
   glutWireCube(1.0);
   glPopMatrix();
   glPushMatrix();
-  glTranslatef(0.564f, (float)sign * 0.205f, 0.0);
+  glTranslatef(0.564, (float)sign * 0.205, 0.0);
   glRotatef((float)sign * -30.0, 0.0, 0.0, 1.0);
-  glTranslatef(0.25f, 0.0, 0.0);
-  glScalef(0.5f, 0.15f, 0.15f);
-  glColor3f(0.35f, 0.35f, 0.35f);
+  glTranslatef(0.25, 0.0, 0.0);
+  glScalef(0.5, 0.15, 0.15);
+  glColor3f(0.35, 0.35, 0.35);
   glutSolidCube(1.0);
   glColor3f(1.0, 1.0, 1.0);
   glutWireCube(1.0);
   glPopMatrix();
   glPopMatrix();
+}
+
+static void draw_open_box(void) {
+  float w = 1.3, h = 1.4, d = 1.3;
+
+  glColor3f(0.6, 0.4, 0.2);
+
+  glBegin(GL_QUADS);
+  glVertex3f(-w, 0.0, -d);
+  glVertex3f(w, 0.0, -d);
+  glVertex3f(w, 0.0, d);
+  glVertex3f(-w, 0.0, d);
+  glEnd();
+
+  glBegin(GL_QUADS);
+  glVertex3f(-w, 0.0, d);
+  glVertex3f(w, 0.0, d);
+  glVertex3f(w, h, d);
+  glVertex3f(-w, h, d);
+  glEnd();
+
+  glBegin(GL_QUADS);
+  glVertex3f(-w, 0.0, -d);
+  glVertex3f(-w, h, -d);
+  glVertex3f(w, h, -d);
+  glVertex3f(w, 0.0, -d);
+  glEnd();
+
+  glBegin(GL_QUADS);
+  glVertex3f(-w, 0.0, -d);
+  glVertex3f(-w, h, -d);
+  glVertex3f(-w, h, d);
+  glVertex3f(-w, 0.0, d);
+  glEnd();
+
+  glBegin(GL_QUADS);
+  glVertex3f(w, 0.0, -d);
+  glVertex3f(w, 0.0, d);
+  glVertex3f(w, h, d);
+  glVertex3f(w, h, -d);
+  glEnd();
+
+  glColor3f(1.0, 1.0, 1.0);
+  glBegin(GL_LINE_LOOP);
+  glVertex3f(-w, 0.0, -d);
+  glVertex3f(w, 0.0, -d);
+  glVertex3f(w, 0.0, d);
+  glVertex3f(-w, 0.0, d);
+  glEnd();
+  glBegin(GL_LINE_LOOP);
+  glVertex3f(-w, 0.0, d);
+  glVertex3f(w, 0.0, d);
+  glVertex3f(w, h, d);
+  glVertex3f(-w, h, d);
+  glEnd();
+  glBegin(GL_LINE_LOOP);
+  glVertex3f(-w, 0.0, -d);
+  glVertex3f(w, 0.0, -d);
+  glVertex3f(w, h, -d);
+  glVertex3f(-w, h, -d);
+  glEnd();
+  glBegin(GL_LINE_LOOP);
+  glVertex3f(-w, 0.0, -d);
+  glVertex3f(-w, h, -d);
+  glVertex3f(-w, h, d);
+  glVertex3f(-w, 0.0, d);
+  glEnd();
+  glBegin(GL_LINE_LOOP);
+  glVertex3f(w, 0.0, -d);
+  glVertex3f(w, 0.0, d);
+  glVertex3f(w, h, d);
+  glVertex3f(w, h, -d);
+  glEnd();
 }
 
 void display(void) {
@@ -217,6 +290,12 @@ void display(void) {
 
   glPopMatrix();
   glPopMatrix();
+
+  glPushMatrix();
+  glTranslatef(1.0, -1.2, 1.5);
+  draw_open_box();
+  glPopMatrix();
+
   glutSwapBuffers();
 }
 
@@ -298,7 +377,7 @@ void keyboard(unsigned char key, int x, int y) {
 
 int main(int argc, char **argv) {
   glutInit(&argc, argv);
-  glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
+  glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
   glutInitWindowSize(500, 500);
   glutInitWindowPosition(100, 100);
   glutCreateWindow(argv[0]);
