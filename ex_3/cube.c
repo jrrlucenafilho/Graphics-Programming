@@ -53,12 +53,12 @@ void init(void)
 void display(void)
 {
    glClear (GL_COLOR_BUFFER_BIT);
-   glColor3f (1.0, 1.0, 1.0);
+   glColor3f (1.0, 0.0, 0.0); // Changed to red
    glLoadIdentity ();             /* clear the matrix */
            /* viewing transformation  */
    gluLookAt (0.0, 0.0, 5.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
-   glScalef (1.0, 2.0, 1.0);      /* modeling transformation */ 
-   glutWireCube (1.0);
+   glScalef (1.0, 1.0, 1.0);      /* modeling transformation */ 
+   glutSolidCube(1.0); // Made into a solid cube
    glFlush ();
 }
 
