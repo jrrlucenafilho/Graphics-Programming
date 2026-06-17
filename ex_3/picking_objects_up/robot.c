@@ -53,6 +53,14 @@ static int base = 0;
 static int forearm = 0;
 static int wrist = 0;
 static int pincer = 0;
+static int cube_grabbed = 0;
+static GLfloat hand_vx, hand_vy, hand_vz;
+static GLfloat view_mat[16];
+static GLfloat cube_vx, cube_vy, cube_vz;
+#define CUBE_X -4.5
+#define CUBE_Y -0.8
+#define CUBE_Z -1.5
+#define GRAB_DIST 2.5
 
 void init(void) {
   glClearColor(0.0, 0.0, 0.0, 0.0);
@@ -185,7 +193,7 @@ static void draw_pincer_finger(int sign) {
 }
 
 static void draw_open_box(void) {
-  float w = 1.3, h = 1.4, d = 1.3;
+  float w = 1.3, h = 1.0, d = 1.3;
 
   glColor3f(0.6, 0.4, 0.2);
 
@@ -260,6 +268,25 @@ static void draw_open_box(void) {
 void display(void) {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+  glGetFloatv(GL_MODELVIEW_MATRIX, view_mat);
+  cube_vx = view_mat[0] * CUBE_X + view_mat[4] * CUBE_Y + view_mat[8] * CUBE_Z +
+            view_mat[12];
+  cube_vy = view_mat[1] * CUBE_X + view_mat[5] * CUBE_Y + view_mat[9] * CUBE_Z +
+            view_mat[13];
+  cube_vz = view_mat[2] * CUBE_X + view_mat[6] * CUBE_Y +
+            view_mat[10] * CUBE_Z + view_mat[14];
+
+  if (!cube_grabbed) {
+    glPushMatrix();
+    glTranslatef(CUBE_X, CUBE_Y, CUBE_Z);
+    glScalef(0.7, 0.7, 0.7);
+    glColor3f(0.6, 0.0, 0.8);
+    glutSolidCube(1.0);
+    glColor3f(1.0, 1.0, 1.0);
+    glutWireCube(1.0);
+    glPopMatrix();
+  }
+
   glPushMatrix();
   glTranslatef(-2.0, -1.0, 0.0);
 
@@ -283,10 +310,30 @@ void display(void) {
   glTranslatef(1.0, 0.0, 0.0);
   glRotatef((GLfloat)wrist, 0.0, 0.0, 1.0);
   glTranslatef(0.5, 0.0, 0.0);
+
+  {
+    GLfloat m[16];
+    glGetFloatv(GL_MODELVIEW_MATRIX, m);
+    hand_vx = m[12];
+    hand_vy = m[13];
+    hand_vz = m[14];
+  }
+
   draw_hand();
 
   draw_pincer_finger(1);
   draw_pincer_finger(-1);
+
+  if (cube_grabbed) {
+    glPushMatrix();
+    glTranslatef(0.0, -0.4, 0.0);
+    glScalef(0.7, 0.7, 0.7);
+    glColor3f(0.6, 0.0, 0.8);
+    glutSolidCube(1.0);
+    glColor3f(1.0, 1.0, 1.0);
+    glutWireCube(1.0);
+    glPopMatrix();
+  }
 
   glPopMatrix();
   glPopMatrix();
@@ -294,15 +341,6 @@ void display(void) {
   glPushMatrix();
   glTranslatef(1.0, -1.2, 1.5);
   draw_open_box();
-  glPopMatrix();
-
-  glPushMatrix();
-  glTranslatef(-4.5, -0.8, -1.5);
-  glScalef(0.8, 0.8, 0.8);
-  glColor3f(0.6, 0.0, 0.8);
-  glutSolidCube(1.0);
-  glColor3f(1.0, 1.0, 1.0);
-  glutWireCube(1.0);
   glPopMatrix();
 
   glutSwapBuffers();
@@ -372,11 +410,21 @@ void keyboard(unsigned char key, int x, int y) {
   case 'p':
     if (pincer < 20)
       pincer += 5;
+    if (pincer >= 15) {
+      float dx = hand_vx - cube_vx;
+      float dy = hand_vy - cube_vy;
+      float dz = hand_vz - cube_vz;
+      float dist = sqrt(dx * dx + dy * dy + dz * dz);
+      if (dist < GRAB_DIST)
+        cube_grabbed = 1;
+    }
     glutPostRedisplay();
     break;
   case 'P':
     if (pincer > -70)
       pincer -= 5;
+    if (pincer <= 5)
+      cube_grabbed = 0;
     glutPostRedisplay();
     break;
   case 27:
