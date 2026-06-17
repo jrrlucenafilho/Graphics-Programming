@@ -60,7 +60,7 @@ static GLfloat cube_vx, cube_vy, cube_vz;
 #define CUBE_X -4.5
 #define CUBE_Y -0.8
 #define CUBE_Z -1.5
-#define GRAB_DIST 2.5
+#define GRAB_DIST 1.0
 
 void init(void) {
   glClearColor(0.0, 0.0, 0.0, 0.0);
