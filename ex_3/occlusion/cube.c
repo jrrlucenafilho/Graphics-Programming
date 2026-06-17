@@ -49,6 +49,23 @@
 // Will control blue cube's position
 static float blue_cube_x_pos = 0.0;
 static float blue_cube_z_pos = -2.0;
+static int blue_first = 0;
+
+static void draw_red_cube(void) {
+  glPushMatrix();
+  glColor3f(1.0, 0.0, 0.0);
+  glTranslatef(0.0, 0.0, 0.0);
+  glutSolidCube(1.0);
+  glPopMatrix();
+}
+
+static void draw_blue_cube(void) {
+  glPushMatrix();
+  glColor3f(0.0, 0.0, 1.0);
+  glTranslatef(blue_cube_x_pos, 0, blue_cube_z_pos);
+  glutSolidCube(1.0);
+  glPopMatrix();
+}
 
 void init(void) {
   glClearColor(0.0, 0.0, 0.0, 0.0);
@@ -57,23 +74,19 @@ void init(void) {
 }
 
 void display(void) {
-  // Added GL_DEPTH_BUFFER_BIT so it clears depth before every frame
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  glColor3f(1.0, 0.0, 0.0); // Changed to red
-  glLoadIdentity();         /* clear the matrix */
-                            /* viewing transformation  */
+  glLoadIdentity();
   gluLookAt(0.0, 0.0, 5.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
-  glScalef(1.0, 1.0, 1.0); /* modeling transformation */
+  glScalef(1.0, 1.0, 1.0);
 
-  // Red cube
-  glTranslatef(0.0, 0.0, 0.0);
-  glutSolidCube(1.0);
-
-  // Blue Cube
-  // Position, draw it a little further, but same (x,y) position
-  glTranslatef(blue_cube_x_pos, 0, blue_cube_z_pos);
-  glColor3f(0.0, 0.0, 1.0);
-  glutSolidCube(1.0);
+  // Swaps order based on blue_first ('i' key)
+  if (blue_first) {
+    draw_blue_cube();
+    draw_red_cube();
+  } else {
+    draw_red_cube();
+    draw_blue_cube();
+  }
 
   glFlush();
 }
@@ -97,6 +110,10 @@ void keyboard(unsigned char key, int x, int y) {
     break;
   case 'S':
     blue_cube_x_pos = blue_cube_x_pos - 0.2;
+    glutPostRedisplay();
+    break;
+  case 'i':
+    blue_first = !blue_first;
     glutPostRedisplay();
   }
 }
