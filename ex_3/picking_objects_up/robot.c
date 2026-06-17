@@ -60,14 +60,7 @@ void init(void) {
   glEnable(GL_DEPTH_TEST);
 }
 
-void display(void) {
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-  // Outer: entire robot arm
-  glPushMatrix();
-  glTranslatef(-2.0, -1.0, 0.0);
-
-  // Base platform
+static void draw_base(void) {
   glPushMatrix();
   glScalef(2.1, 0.3, 2.0);
   glColor3f(0.3f, 0.3f, 0.3f);
@@ -75,17 +68,9 @@ void display(void) {
   glColor3f(1.0, 1.0, 1.0);
   glutWireCube(1.0);
   glPopMatrix();
+}
 
-  // Move to shoulder joint (where arm meets the base)
-  glTranslatef(-0.4, -0.2, 0.0);
-
-  // Base rotation around Y to rotate around shoulder joint
-  glRotatef((GLfloat)base, 0.0, 1.0, 0.0);
-
-  // Shoulder (pivot at origin, which is the shoulder joint)
-  glPushMatrix();
-  glRotatef((GLfloat)shoulder, 0.0, 0.0, 1.0);
-  glTranslatef(1.0, 0.0, 0.0);
+static void draw_shoulder(void) {
   glPushMatrix();
   glScalef(2.0, 0.4, 0.4);
   glColor3f(0.5f, 0.5f, 0.5f);
@@ -93,14 +78,9 @@ void display(void) {
   glColor3f(1.0, 1.0, 1.0);
   glutWireCube(1.0);
   glPopMatrix();
+}
 
-  // Elbow (pivot at right edge of shoulder)
-  glTranslatef(1.0, 0.0, 0.0);
-  glRotatef((GLfloat)elbow, 0.0, 0.0, 1.0);
-  glTranslatef(1.0, 0.0, 0.0);
-
-  // Forearm self-rotation (spins in place around its own center)
-  glRotatef((GLfloat)forearm, 1.0, 0.0, 0.0);
+static void draw_forearm(void) {
   glPushMatrix();
   glScalef(2.0, 0.4, 0.4);
   glColor3f(0.5f, 0.5f, 0.5f);
@@ -108,17 +88,14 @@ void display(void) {
   glColor3f(1.0, 1.0, 1.0);
   glutWireCube(1.0);
   glPopMatrix();
+}
 
-  // Move to wrist joint, then rotate, then offset hand
-  glTranslatef(1.0, 0.0, 0.0);              // to end of forearm (wrist joint)
-  glRotatef((GLfloat)wrist, 0.0, 0.0, 1.0); // wrist rotation at joint
-  glTranslatef(0.5, 0.0, 0.0);              // offset to center hand
+static void draw_hand(void) {
   float r = 0.5, d = 0.1;
   int i;
 
   glColor3f(0.5f, 0.5f, 0.5f);
 
-  // Front face (filled semicircle)
   glBegin(GL_TRIANGLE_FAN);
   glVertex3f(0.0, 0.0, d);
   for (i = 0; i <= 20; i++) {
@@ -127,7 +104,6 @@ void display(void) {
   }
   glEnd();
 
-  // Back face (filled semicircle)
   glBegin(GL_TRIANGLE_FAN);
   glVertex3f(0.0, 0.0, -d);
   for (i = 0; i <= 20; i++) {
@@ -136,7 +112,6 @@ void display(void) {
   }
   glEnd();
 
-  // Curved side wall
   glBegin(GL_QUAD_STRIP);
   for (i = 0; i <= 20; i++) {
     float a = i * M_PI / 20.0;
@@ -146,7 +121,6 @@ void display(void) {
   }
   glEnd();
 
-  // Flat side wall
   glBegin(GL_QUADS);
   glVertex3f(0.0, r, d);
   glVertex3f(0.0, -r, d);
@@ -154,7 +128,6 @@ void display(void) {
   glVertex3f(0.0, r, -d);
   glEnd();
 
-  // White wireframe edges on hand
   glColor3f(1.0, 1.0, 1.0);
   glBegin(GL_LINE_STRIP);
   for (i = 0; i <= 20; i++) {
@@ -183,13 +156,14 @@ void display(void) {
     glVertex3f(-sin(a) * r, cos(a) * r, -d);
   }
   glEnd();
+}
 
-  // Upper pincer finger
+static void draw_pincer_finger(int sign) {
   glPushMatrix();
-  glTranslatef(0.0, 0.4f, 0.0);
-  glRotatef(-(GLfloat)pincer, 0.0, 0.0, 1.0);
+  glTranslatef(0.0, (float)sign * 0.4f, 0.0);
+  glRotatef(-(float)sign * (GLfloat)pincer, 0.0, 0.0, 1.0);
   glPushMatrix();
-  glRotatef(20.0, 0.0, 0.0, 1.0);
+  glRotatef((float)sign * 20.0, 0.0, 0.0, 1.0);
   glTranslatef(0.3f, 0.0, 0.0);
   glScalef(0.6f, 0.15f, 0.15f);
   glColor3f(0.35f, 0.35f, 0.35f);
@@ -198,8 +172,8 @@ void display(void) {
   glutWireCube(1.0);
   glPopMatrix();
   glPushMatrix();
-  glTranslatef(0.564f, 0.205f, 0.0);
-  glRotatef(-30.0, 0.0, 0.0, 1.0);
+  glTranslatef(0.564f, (float)sign * 0.205f, 0.0);
+  glRotatef((float)sign * -30.0, 0.0, 0.0, 1.0);
   glTranslatef(0.25f, 0.0, 0.0);
   glScalef(0.5f, 0.15f, 0.15f);
   glColor3f(0.35f, 0.35f, 0.35f);
@@ -208,34 +182,41 @@ void display(void) {
   glutWireCube(1.0);
   glPopMatrix();
   glPopMatrix();
+}
 
-  // Lower pincer finger
-  glPushMatrix();
-  glTranslatef(0.0, -0.4f, 0.0);
-  glRotatef((GLfloat)pincer, 0.0, 0.0, 1.0);
-  glPushMatrix();
-  glRotatef(-20.0, 0.0, 0.0, 1.0);
-  glTranslatef(0.3f, 0.0, 0.0);
-  glScalef(0.6f, 0.15f, 0.15f);
-  glColor3f(0.35f, 0.35f, 0.35f);
-  glutSolidCube(1.0);
-  glColor3f(1.0, 1.0, 1.0);
-  glutWireCube(1.0);
-  glPopMatrix();
-  glPushMatrix();
-  glTranslatef(0.564f, -0.205f, 0.0);
-  glRotatef(30.0, 0.0, 0.0, 1.0);
-  glTranslatef(0.25f, 0.0, 0.0);
-  glScalef(0.5f, 0.15f, 0.15f);
-  glColor3f(0.35f, 0.35f, 0.35f);
-  glutSolidCube(1.0);
-  glColor3f(1.0, 1.0, 1.0);
-  glutWireCube(1.0);
-  glPopMatrix();
-  glPopMatrix();
+void display(void) {
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  glPopMatrix(); // end shoulder/elbow
-  glPopMatrix(); // end base/outer
+  glPushMatrix();
+  glTranslatef(-2.0, -1.0, 0.0);
+
+  draw_base();
+
+  glTranslatef(-0.4, -0.2, 0.0);
+  glRotatef((GLfloat)base, 0.0, 1.0, 0.0);
+
+  glPushMatrix();
+  glRotatef((GLfloat)shoulder, 0.0, 0.0, 1.0);
+  glTranslatef(1.0, 0.0, 0.0);
+  draw_shoulder();
+
+  glTranslatef(1.0, 0.0, 0.0);
+  glRotatef((GLfloat)elbow, 0.0, 0.0, 1.0);
+  glTranslatef(1.0, 0.0, 0.0);
+
+  glRotatef((GLfloat)forearm, 1.0, 0.0, 0.0);
+  draw_forearm();
+
+  glTranslatef(1.0, 0.0, 0.0);
+  glRotatef((GLfloat)wrist, 0.0, 0.0, 1.0);
+  glTranslatef(0.5, 0.0, 0.0);
+  draw_hand();
+
+  draw_pincer_finger(1);
+  draw_pincer_finger(-1);
+
+  glPopMatrix();
+  glPopMatrix();
   glutSwapBuffers();
 }
 
