@@ -42,19 +42,23 @@
  *  A wireframe cube is rendered.
  */
 #include <GL/freeglut_std.h>
+#include <GL/gl.h>
 #include <GL/glut.h>
 #include <stdlib.h>
 
-// Will control blue cube's depth
+// Will control blue cube's position
+static float blue_cube_x_pos = 0.0;
 static float blue_cube_z_pos = -2.0;
 
 void init(void) {
   glClearColor(0.0, 0.0, 0.0, 0.0);
   glShadeModel(GL_FLAT);
+  glEnable(GL_DEPTH_TEST);
 }
 
 void display(void) {
-  glClear(GL_COLOR_BUFFER_BIT);
+  // Added GL_DEPTH_BUFFER_BIT so it clears depth before every frame
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glColor3f(1.0, 0.0, 0.0); // Changed to red
   glLoadIdentity();         /* clear the matrix */
                             /* viewing transformation  */
@@ -67,7 +71,7 @@ void display(void) {
 
   // Blue Cube
   // Position, draw it a little further, but same (x,y) position
-  glTranslatef(0.0, 0.0, blue_cube_z_pos);
+  glTranslatef(blue_cube_x_pos, 0, blue_cube_z_pos);
   glColor3f(0.0, 0.0, 1.0);
   glutSolidCube(1.0);
 
@@ -87,12 +91,21 @@ void keyboard(unsigned char key, int x, int y) {
   case 27:
     exit(0);
     break;
+  case 's':
+    blue_cube_x_pos = blue_cube_x_pos + 0.2;
+    glutPostRedisplay();
+    break;
+  case 'S':
+    blue_cube_x_pos = blue_cube_x_pos - 0.2;
+    glutPostRedisplay();
   }
 }
 
 int main(int argc, char **argv) {
   glutInit(&argc, argv);
-  glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
+
+  // Added GLUT_DEPTH to display
+  glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB | GLUT_DEPTH); // Added GLUT_DEPTH
   glutInitWindowSize(500, 500);
   glutInitWindowPosition(100, 100);
   glutCreateWindow(argv[0]);
