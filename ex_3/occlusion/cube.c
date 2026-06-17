@@ -41,8 +41,12 @@
  *  glScalef() and a single viewing transformation, gluLookAt().
  *  A wireframe cube is rendered.
  */
+#include <GL/freeglut_std.h>
 #include <GL/glut.h>
 #include <stdlib.h>
+
+// Will control blue cube's depth
+static float blue_cube_z_pos = -2.0;
 
 void init(void) {
   glClearColor(0.0, 0.0, 0.0, 0.0);
@@ -56,7 +60,17 @@ void display(void) {
                             /* viewing transformation  */
   gluLookAt(0.0, 0.0, 5.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
   glScalef(1.0, 1.0, 1.0); /* modeling transformation */
-  glutSolidCube(1.0);      // Made into a solid cube
+
+  // Red cube
+  glTranslatef(0.0, 0.0, 0.0);
+  glutSolidCube(1.0);
+
+  // Blue Cube
+  // Position, draw it a little further, but same (x,y) position
+  glTranslatef(0.0, 0.0, blue_cube_z_pos);
+  glColor3f(0.0, 0.0, 1.0);
+  glutSolidCube(1.0);
+
   glFlush();
 }
 
