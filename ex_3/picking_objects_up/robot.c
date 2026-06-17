@@ -194,7 +194,7 @@ static void draw_pincer_finger(int sign) {
 }
 
 static void draw_open_box(void) {
-  float w = 1.3, h = 1.0, d = 1.3;
+  float w = 1.3, h = 1.5, d = 1.3;
 
   glColor3f(0.6, 0.4, 0.2);
 
