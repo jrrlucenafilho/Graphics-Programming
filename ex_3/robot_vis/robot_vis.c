@@ -69,7 +69,7 @@ void display(void) {
   glPopMatrix();
 
   // Elbow
-  glTranslatef(1.0, 0.0, 0.0);
+  glTranslatef(0.5, 0.0, 0.0);
   glColor3f(0.0, 0.0, 1.0);
   glRotatef((GLfloat)elbow, 0.0, 1.0, 0.0); // Y axis as the rotation axis
   glTranslatef(1.0, 0.0, 0.0);
