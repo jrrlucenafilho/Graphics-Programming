@@ -69,8 +69,9 @@ void init(void) {
 void display(void) {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  // NOTE: changed slices and stacks as requested, the render time increases wayy too much as expected
-  // also: `fghGenerateSphere: too many slices or stacks requested, indices will wrap` warn shows up
+  // NOTE: changed slices and stacks as requested, the render time increases
+  // wayy too much as expected also: `fghGenerateSphere: too many slices or
+  // stacks requested, indices will wrap` warn shows up
   glutSolidSphere(1.0, 320, 256);
   glFlush();
 }
