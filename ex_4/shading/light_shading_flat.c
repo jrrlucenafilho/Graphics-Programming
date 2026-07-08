@@ -72,7 +72,8 @@ void display(void) {
   // NOTE: changed slices and stacks as requested, the render time increases
   // wayy too much as expected also: `fghGenerateSphere: too many slices or
   // stacks requested, indices will wrap` warn shows up
-  glutSolidSphere(1.0, 320, 256);
+  // glutSolidSphere(1.0, 320, 256);
+  glutSolidSphere(1.0, 20, 16);
   glFlush();
 }
 
