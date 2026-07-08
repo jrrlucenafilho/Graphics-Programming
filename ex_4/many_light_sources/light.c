@@ -44,6 +44,10 @@
 #include <GL/glut.h>
 #include <stdlib.h>
 
+int red_on = 1;
+int green_on = 1;
+int blue_on = 1;
+
 /*  Initialize material property, light source, lighting model,
  *  and depth buffer.
  */
@@ -83,14 +87,27 @@ void init(void) {
   glLightfv(GL_LIGHT2, GL_SPECULAR, blue_light_color);
 
   glEnable(GL_LIGHTING);
-  glEnable(GL_LIGHT0);
-  glEnable(GL_LIGHT1);
-  glEnable(GL_LIGHT2);
   glEnable(GL_DEPTH_TEST);
 }
 
 void display(void) {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+  if (red_on)
+    glEnable(GL_LIGHT0);
+  else
+    glDisable(GL_LIGHT0);
+
+  if (green_on)
+    glEnable(GL_LIGHT1);
+  else
+    glDisable(GL_LIGHT1);
+
+  if (blue_on)
+    glEnable(GL_LIGHT2);
+  else
+    glDisable(GL_LIGHT2);
+
   glutSolidSphere(1.0, 80, 64);
   glFlush();
 }
@@ -113,6 +130,18 @@ void keyboard(unsigned char key, int x, int y) {
   switch (key) {
   case 27:
     exit(0);
+    break;
+  case 'r':
+    red_on = !red_on;
+    glutPostRedisplay();
+    break;
+  case 'g':
+    green_on = !green_on;
+    glutPostRedisplay();
+    break;
+  case 'b':
+    blue_on = !blue_on;
+    glutPostRedisplay();
     break;
   }
 }
