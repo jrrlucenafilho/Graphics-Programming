@@ -54,8 +54,8 @@ void init(void) {
 
   glClearColor(0.0, 0.0, 0.0, 0.0);
 
-  // Edited this one
-  glShadeModel(GL_FLAT);
+  // NOTE: Edited this one, changed it to smooth shading
+  glShadeModel(GL_SMOOTH);
 
   glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
   glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
@@ -68,7 +68,12 @@ void init(void) {
 
 void display(void) {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  glutSolidSphere(1.0, 20, 16);
+
+  // NOTE: changed slices and stacks as requested, the render time increases as
+  // expected but waay less slices and stacks are needed to reach a good enough
+  // render, and thus less processing power and rendering time are needed with
+  // this approach
+  glutSolidSphere(1.0, 80, 64);
   glFlush();
 }
 
