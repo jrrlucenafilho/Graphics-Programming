@@ -1,13 +1,13 @@
 /*
  * Copyright (c) 1993-1997, Silicon Graphics, Inc.
- * ALL RIGHTS RESERVED 
- * Permission to use, copy, modify, and distribute this software for 
+ * ALL RIGHTS RESERVED
+ * Permission to use, copy, modify, and distribute this software for
  * any purpose and without fee is hereby granted, provided that the above
  * copyright notice appear in all copies and that both the copyright notice
- * and this permission notice appear in supporting documentation, and that 
+ * and this permission notice appear in supporting documentation, and that
  * the name of Silicon Graphics, Inc. not be used in advertising
  * or publicity pertaining to distribution of the software without specific,
- * written prior permission. 
+ * written prior permission.
  *
  * THE MATERIAL EMBODIED ON THIS SOFTWARE IS PROVIDED TO YOU "AS-IS"
  * AND WITHOUT WARRANTY OF ANY KIND, EXPRESS, IMPLIED OR OTHERWISE,
@@ -21,8 +21,8 @@
  * ADVISED OF THE POSSIBILITY OF SUCH LOSS, HOWEVER CAUSED AND ON
  * ANY THEORY OF LIABILITY, ARISING OUT OF OR IN CONNECTION WITH THE
  * POSSESSION, USE OR PERFORMANCE OF THIS SOFTWARE.
- * 
- * US Government Users Restricted Rights 
+ *
+ * US Government Users Restricted Rights
  * Use, duplication, or disclosure by the Government is subject to
  * restrictions set forth in FAR 52.227.19(c)(2) or subparagraph
  * (c)(1)(ii) of the Rights in Technical Data and Computer Software
@@ -58,13 +58,12 @@ static int spin = 0;
 /*  Initialize material property, light source, lighting model,
  *  and depth buffer.
  */
-void init(void) 
-{
-   glClearColor (0.0, 0.0, 0.0, 0.0);
-   glShadeModel (GL_SMOOTH);
-   glEnable(GL_LIGHTING);
-   glEnable(GL_LIGHT0);
-   glEnable(GL_DEPTH_TEST);
+void init(void) {
+  glClearColor(0.0, 0.0, 0.0, 0.0);
+  glShadeModel(GL_SMOOTH);
+  glEnable(GL_LIGHTING);
+  glEnable(GL_LIGHT0);
+  glEnable(GL_DEPTH_TEST);
 }
 
 /*  Here the light position follows the camera. It is set at the
@@ -72,94 +71,89 @@ void init(void)
  *  at the camera origin in eye space. The camera then moves
  *  through the scene, carrying the light with it.
  */
-void display(void)
-{
-   GLfloat position[] = { 0.0, 0.0, 0.0, 1.0 };
+void display(void) {
+  GLfloat position[] = {0.0, 0.0, 0.0, 1.0};
 
-   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-   glPushMatrix();
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  glPushMatrix();
 
-   /*  Light follows camera - bottom of modelview stack.
-    *  Position (0,0,0,1) at identity puts the light at
-    *  the camera in eye space.
-    */
-   glLightfv(GL_LIGHT0, GL_POSITION, position);
+  /*  Light follows camera - bottom of modelview stack.
+   *  Position (0,0,0,1) at identity puts the light at
+   *  the camera in eye space.
+   */
+  glLightfv(GL_LIGHT0, GL_POSITION, position);
 
-   /*  Light indicator near camera  */
-   glPushMatrix();
-   glTranslated(0.0, 0.0, -1.5);
-   glDisable(GL_LIGHTING);
-   glColor3f(0.0, 1.0, 1.0);
-   glutWireCube(0.1);
-   glEnable(GL_LIGHTING);
-   glPopMatrix();
+  /*  Light indicator near camera  */
+  glPushMatrix();
+  glTranslated(0.0, 0.0, -1.5);
+  glDisable(GL_LIGHTING);
+  glColor3f(0.0, 1.0, 1.0);
+  glutWireCube(0.1);
+  glEnable(GL_LIGHTING);
+  glPopMatrix();
 
-   /*  Camera view  */
-   gluLookAt(0.0, 0.0, 5.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+  /*  Camera view  */
+  gluLookAt(0.0, 0.0, 8.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
 
-   /*  Camera translates along Z - controlled by spin.
-    *  This replaces the former glRotated on the light.
-    */
-   glTranslated(0.0, 0.0, (GLdouble)spin * 0.05);
+  /*  Camera translates along Z - controlled by spin.
+   *  This replaces the former glRotated on the light.
+   */
+  glTranslated(0.0, 0.0, (GLdouble)spin * 0.05);
 
-   /*  First torus  */
-   glutSolidTorus(0.275, 0.85, 8, 15);
+  /*  First torus  */
+  glutSolidTorus(0.275, 0.85, 8, 15);
 
-   /*  Second torus behind the first  */
-   glPushMatrix();
-   glTranslated(0.0, 0.0, 2.0);
-   glutSolidTorus(0.275, 0.85, 8, 15);
-   glPopMatrix();
+  /*  Second torus behind the first  */
+  glPushMatrix();
+  glTranslated(0.0, 0.0, 2.0);
+  glutSolidTorus(0.275, 0.85, 8, 15);
+  glPopMatrix();
 
-   glPopMatrix();
-   glFlush();
+  glPopMatrix();
+  glFlush();
 }
 
-void reshape (int w, int h)
-{
-   glViewport (0, 0, (GLsizei) w, (GLsizei) h);
-   glMatrixMode (GL_PROJECTION);
-   glLoadIdentity();
-   gluPerspective(40.0, (GLfloat) w/(GLfloat) h, 1.0, 20.0);
-   glMatrixMode(GL_MODELVIEW);
-   glLoadIdentity();
+void reshape(int w, int h) {
+  glViewport(0, 0, (GLsizei)w, (GLsizei)h);
+  glMatrixMode(GL_PROJECTION);
+  glLoadIdentity();
+  gluPerspective(40.0, (GLfloat)w / (GLfloat)h, 1.0, 20.0);
+  glMatrixMode(GL_MODELVIEW);
+  glLoadIdentity();
 }
 
-void mouse(int button, int state, int x, int y)
-{
-   switch (button) {
-      case GLUT_LEFT_BUTTON:
-         if (state == GLUT_DOWN) {
-            spin = (spin + 30) % 360;
-            glutPostRedisplay();
-         }
-         break;
-      default:
-         break;
-   }
+void mouse(int button, int state, int x, int y) {
+  switch (button) {
+  case GLUT_LEFT_BUTTON:
+    if (state == GLUT_DOWN) {
+      spin = (spin + 30) % 360;
+      glutPostRedisplay();
+    }
+    break;
+  default:
+    break;
+  }
 }
 
-void keyboard(unsigned char key, int x, int y)
-{
-   switch (key) {
-      case 27:
-         exit(0);
-         break;
-   }
+void keyboard(unsigned char key, int x, int y) {
+  switch (key) {
+  case 27:
+    exit(0);
+    break;
+  }
 }
 
-int main(int argc, char** argv)
-{
-   glutInit(&argc, argv);
-   glutInitDisplayMode (GLUT_SINGLE | GLUT_RGB | GLUT_DEPTH);
-   glutInitWindowSize (500, 500); 
-   glutInitWindowPosition (100, 100);
-   glutCreateWindow (argv[0]);
-   init ();
-   glutDisplayFunc(display); 
-   glutReshapeFunc(reshape);
-   glutMouseFunc(mouse);
-   glutKeyboardFunc(keyboard);
-   glutMainLoop();
-   return 0;
+int main(int argc, char **argv) {
+  glutInit(&argc, argv);
+  glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB | GLUT_DEPTH);
+  glutInitWindowSize(500, 500);
+  glutInitWindowPosition(100, 100);
+  glutCreateWindow(argv[0]);
+  init();
+  glutDisplayFunc(display);
+  glutReshapeFunc(reshape);
+  glutMouseFunc(mouse);
+  glutKeyboardFunc(keyboard);
+  glutMainLoop();
+  return 0;
 }
