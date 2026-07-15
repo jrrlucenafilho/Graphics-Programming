@@ -153,7 +153,8 @@ void display(void) {
 
   glEnable(GL_TEXTURE_2D);
 
-  glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+  // NOTE: Change 7: GL_DECAL to GL_MODULATE
+  glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
   glBindTexture(GL_TEXTURE_2D, texture);
   glBegin(GL_QUADS);
   glTexCoord2f(0.0, 0.0);
