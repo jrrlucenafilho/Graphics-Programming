@@ -42,6 +42,10 @@
  *  If running this program on OpenGL 1.0, texture objects are
  *  not used.
  */
+
+#define STB_IMAGE_IMPLEMENTATION
+
+#include "stb_image.h"
 #include <GL/glut.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -51,20 +55,43 @@
 #define checkImageHeight 64
 static GLubyte checkImage[checkImageHeight][checkImageWidth][4];
 
+static GLuint texture;
+
 #ifdef GL_VERSION_1_1
 static GLuint texName;
 #endif
+
+void loadTexture(const char *filename) {
+  int width, height, nrChannels;
+  unsigned char *data = stbi_load(filename, &width, &height, &nrChannels, 0);
+  if (data) {
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    // Set texture wrapping and filtering parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+                    GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    // Load the texture data ( check if it 's RGB or RGBA )
+    if (nrChannels == 3) {
+      gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGB, width, height, GL_RGB,
+                        GL_UNSIGNED_BYTE, data);
+    } else if (nrChannels == 4) {
+      gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, width, height, GL_RGBA,
+                        GL_UNSIGNED_BYTE, data);
+    }
+    stbi_image_free(data);
+  } else {
+    fprintf(stderr, "Failed to load texture: %s\n", filename);
+  }
+}
 
 void makeCheckImage(void) {
   int i, j, c;
 
   for (i = 0; i < checkImageHeight; i++) {
     for (j = 0; j < checkImageWidth; j++) {
-      // NOTE: Change 2: increase the number of squares on the texture
-      // by changing the hexadecimal
-      // NOTE: Change 4: turn the number of squares back to 0x8
-      // we can see this looks a bit better (more fidelity to the non-magnified
-      // texture)
       c = ((((i & 0x8) == 0) ^ ((j & 0x8)) == 0)) * 255;
       checkImage[i][j][0] = (GLubyte)c;
       checkImage[i][j][1] = (GLubyte)c;
@@ -87,12 +114,10 @@ void init(void) {
   glBindTexture(GL_TEXTURE_2D, texName);
 #endif
 
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-  // NOTE: Change 3: Change to GL_LINEAR, we now can see the bilinear filtering
-  // in action
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 #ifdef GL_VERSION_1_1
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, checkImageWidth, checkImageHeight, 0,
                GL_RGBA, GL_UNSIGNED_BYTE, checkImage);
@@ -103,35 +128,30 @@ void init(void) {
 }
 
 void display(void) {
+  loadTexture("texture_image.jpg");
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glEnable(GL_TEXTURE_2D);
   glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
-#ifdef GL_VERSION_1_1
-  glBindTexture(GL_TEXTURE_2D, texName);
-#endif
+  glBindTexture(GL_TEXTURE_2D, texture);
 
-  // NOTE: Change 1: Edit coords to create a specific view
-  // NOTE: Change 5: Increase texture scaling by increasi the limit to (0.0,
-  // 0.0) -> (10.0, 10.0)
   glBegin(GL_QUADS);
   glTexCoord2f(0.0, 0.0);
-  glVertex3f(-1.0, -1.0, 3.0); // Bottom-left
-  glTexCoord2f(10.0, 0.0);
-  glVertex3f(1.0, -1.0, 3.0); // Bottom-right
-  glTexCoord2f(10.0, 10.0);
-  glVertex3f(1.0, 1.0, -2.0); // Top-right
-  glTexCoord2f(0.0, 10.0);
-  glVertex3f(-1.0, 1.0, -2.0); // Top-left
+  glVertex3f(-2.0, -1.0, 0.0);
+  glTexCoord2f(0.0, 1.0);
+  glVertex3f(-2.0, 1.0, 0.0);
+  glTexCoord2f(1.0, 1.0);
+  glVertex3f(0.0, 1.0, 0.0);
+  glTexCoord2f(1.0, 0.0);
+  glVertex3f(0.0, -1.0, 0.0);
 
-  // NOTE: Change 1: Remove second square
-  // glTexCoord2f(0.0, 0.0);
-  // glVertex3f(1.0, -1.0, 0.0);
-  // glTexCoord2f(0.0, 1.0);
-  // glVertex3f(1.0, 1.0, 0.0);
-  // glTexCoord2f(1.0, 1.0);
-  // glVertex3f(2.41421, 1.0, -1.41421);
-  // glTexCoord2f(1.0, 0.0);
-  // glVertex3f(2.41421, -1.0, -1.41421);
+  glTexCoord2f(0.0, 0.0);
+  glVertex3f(1.0, -1.0, 0.0);
+  glTexCoord2f(0.0, 1.0);
+  glVertex3f(1.0, 1.0, 0.0);
+  glTexCoord2f(1.0, 1.0);
+  glVertex3f(2.41421, 1.0, -1.41421);
+  glTexCoord2f(1.0, 0.0);
+  glVertex3f(2.41421, -1.0, -1.41421);
   glEnd();
   glFlush();
   glDisable(GL_TEXTURE_2D);
