@@ -60,8 +60,12 @@ void makeCheckImage(void) {
 
   for (i = 0; i < checkImageHeight; i++) {
     for (j = 0; j < checkImageWidth; j++) {
-      // NOTE: Change 2: increase the number of squares ion the texture
-      c = ((((i & 0x8) == 0) ^ ((j & 0x1)) == 0)) * 255;
+      // NOTE: Change 2: increase the number of squares on the texture
+      // by changing the hexadecimal
+      // NOTE: Change 4: turn the number of squares back to 0x8
+      // we can see this looks a bit better (more fidelity to the non-magnified
+      // texture)
+      c = ((((i & 0x8) == 0) ^ ((j & 0x8)) == 0)) * 255;
       checkImage[i][j][0] = (GLubyte)c;
       checkImage[i][j][1] = (GLubyte)c;
       checkImage[i][j][2] = (GLubyte)c;
@@ -85,8 +89,10 @@ void init(void) {
 
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  // NOTE: Change 3: Change to GL_LINEAR, we now can see the bilinear filtering
+  // in action
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 #ifdef GL_VERSION_1_1
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, checkImageWidth, checkImageHeight, 0,
                GL_RGBA, GL_UNSIGNED_BYTE, checkImage);
@@ -105,14 +111,16 @@ void display(void) {
 #endif
 
   // NOTE: Change 1: Edit coords to create a specific view
+  // NOTE: Change 5: Increase texture scaling by increasi the limit to (0.0,
+  // 0.0) -> (10.0, 10.0)
   glBegin(GL_QUADS);
   glTexCoord2f(0.0, 0.0);
   glVertex3f(-1.0, -1.0, 3.0); // Bottom-left
-  glTexCoord2f(1.0, 0.0);
+  glTexCoord2f(10.0, 0.0);
   glVertex3f(1.0, -1.0, 3.0); // Bottom-right
-  glTexCoord2f(1.0, 1.0);
+  glTexCoord2f(10.0, 10.0);
   glVertex3f(1.0, 1.0, -2.0); // Top-right
-  glTexCoord2f(0.0, 1.0);
+  glTexCoord2f(0.0, 10.0);
   glVertex3f(-1.0, 1.0, -2.0); // Top-left
 
   // NOTE: Change 1: Remove second square
