@@ -113,6 +113,11 @@ void display(void) {
   // NOTE: Change 2.8: Redo this exercise with a sphere
   GLUquadric * quad = gluNewQuadric ();
   gluQuadricTexture ( quad , GL_TRUE );
+  // NOTE: Change 5: Scale tex coords from [0,1] to [0,10]
+  glMatrixMode(GL_TEXTURE);
+  glLoadIdentity();
+  glScalef(10.0, 10.0, 1.0);
+  glMatrixMode(GL_MODELVIEW);
   gluSphere ( quad , 1.0 , 32 , 32);
   
   glFlush();
