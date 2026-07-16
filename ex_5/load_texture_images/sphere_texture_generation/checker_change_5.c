@@ -109,7 +109,7 @@ void display(void) {
 #ifdef GL_VERSION_1_1
   glBindTexture(GL_TEXTURE_2D, texName);
 #endif
-// test
+
   // NOTE: Change 2.8: Redo this exercise with a sphere
   GLUquadric * quad = gluNewQuadric ();
   gluQuadricTexture ( quad , GL_TRUE );
