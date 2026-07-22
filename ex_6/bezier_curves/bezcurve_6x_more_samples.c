@@ -41,23 +41,17 @@
 #include <GL/glut.h>
 #include <stdlib.h>
 
-GLfloat ctrlpoints_center[4][3] = {
-    {0.5, 0.0, 0.0},  /* Bottom left */
-    {1.7, 1.5, 0.0},  /* Upper right */
-    {0.0, 1.5, 0.0},  /* Upper left */
-    {1.2, 0.0, 0.0}}; /* Bottom right */
+// NOTE: 1st change: properly managing control points for the desired image
+GLfloat ctrlpoints_center[4][3] = {{0.5, 0.0, 0.0},  /* Bottom left */
+                                   {1.7, 1.5, 0.0},  /* Upper right */
+                                   {0.0, 1.5, 0.0},  /* Upper left */
+                                   {1.2, 0.0, 0.0}}; /* Bottom right */
 
 GLfloat ctrlpoints_left[4][3] = {
-    {0.5, 0.0, 0.0},   
-    {-0.7, 0.9, 0.0}, 
-    {1.0, 0.9, 0.0},   
-    {-0.2, 0.0, 0.0}}; 
+    {0.5, 0.0, 0.0}, {-0.7, 0.9, 0.0}, {1.0, 0.9, 0.0}, {-0.2, 0.0, 0.0}};
 
 GLfloat ctrlpoints_right[4][3] = {
-    {1.2, 0.0, 0.0},  
-    {2.4, 0.9, 0.0},  
-    {0.7, 0.9, 0.0},  
-    {1.9, 0.0, 0.0}}; 
+    {1.2, 0.0, 0.0}, {2.4, 0.9, 0.0}, {0.7, 0.9, 0.0}, {1.9, 0.0, 0.0}};
 
 void init(void) {
   glClearColor(0.0, 0.0, 0.0, 0.0);
@@ -88,12 +82,14 @@ void display(void) {
   glColor3f(0.976, 0.0, 0.976);
   glMap1f(GL_MAP1_VERTEX_3, 0.0, 1.0, 3, 4, &ctrlpoints_right[0][0]);
   glBegin(GL_LINE_STRIP);
-  for (i = 0; i <= 30; i++)
-    glEvalCoord1f((GLfloat)i / 30.0);
+
+  // NOTE: 2nd change, increase sample size by inceasing max value for 'i' and
+  // fraction denominator (3x change)
+  for (i = 0; i <= 180; i++)
+    glEvalCoord1f((GLfloat)i / 180.0);
   glEnd();
 
   glMap1f(GL_MAP1_VERTEX_3, 0.0, 1.0, 3, 4, &ctrlpoints_center[0][0]);
-
 
   glFlush();
 }
@@ -107,18 +103,17 @@ void reshape(int w, int h) {
   GLfloat min_y = 0.0, max_y = 1.5;
   GLfloat cx = (min_x + max_x) / 2.0;
   GLfloat cy = (min_y + max_y) / 2.0;
-  GLfloat range = (max_x - min_x > max_y - min_y) ? (max_x - min_x) / 2.0 : (max_y - min_y) / 2.0;
+  GLfloat range = (max_x - min_x > max_y - min_y) ? (max_x - min_x) / 2.0
+                                                  : (max_y - min_y) / 2.0;
   range *= 1.2;
 
   if (w <= h) {
     GLfloat aspect = (GLfloat)h / (GLfloat)w;
-    glOrtho(cx - range, cx + range,
-            cy - range * aspect, cy + range * aspect,
+    glOrtho(cx - range, cx + range, cy - range * aspect, cy + range * aspect,
             -5.0, 5.0);
   } else {
     GLfloat aspect = (GLfloat)w / (GLfloat)h;
-    glOrtho(cx - range * aspect, cx + range * aspect,
-            cy - range, cy + range,
+    glOrtho(cx - range * aspect, cx + range * aspect, cy - range, cy + range,
             -5.0, 5.0);
   }
   glMatrixMode(GL_MODELVIEW);
