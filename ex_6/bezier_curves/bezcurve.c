@@ -41,15 +41,30 @@
 #include <GL/glut.h>
 #include <stdlib.h>
 
-GLfloat ctrlpoints[4][3] = {
-    {0.5, 0.0, 0.0}, {1.7, 1.5, 0.0}, {0.0, 1.5, 0.0}, {1.2, 0.0, 0.0}};
+GLfloat ctrlpoints_center[4][3] = {
+    {0.5, 0.0, 0.0},  /* P0 - center bottom (shared) */
+    {1.7, 1.5, 0.0},  /* P1 - upper right */
+    {0.0, 1.5, 0.0},  /* P2 - upper left */
+    {1.2, 0.0, 0.0}}; /* P3 - bottom right */
+
+GLfloat ctrlpoints_left[4][3] = {
+    {0.5, 0.0, 0.0},   /* P0 - center bottom (shared) */
+    {-0.7, 1.5, 0.0},  /* P1 - upper left */
+    {1.0, 1.5, 0.0},   /* P2 - upper right */
+    {-0.2, 0.0, 0.0}}; /* P3 - bottom left */
+
+GLfloat ctrlpoints_right[4][3] = {
+    {1.2, 0.0, 0.0},  /* P0 - center bottom (shared) */
+    {2.4, 1.5, 0.0},  /* P1 - upper right */
+    {0.7, 1.5, 0.0},  /* P2 - upper left */
+    {1.9, 0.0, 0.0}}; /* P3 - bottom right */
 
 void init(void) {
   glClearColor(0.0, 0.0, 0.0, 0.0);
   glShadeModel(GL_FLAT);
 
   // This makes the evaluator which maps the Bezier's control points
-  glMap1f(GL_MAP1_VERTEX_3, 0.0, 1.0, 3, 4, &ctrlpoints[0][0]);
+  glMap1f(GL_MAP1_VERTEX_3, 0.0, 1.0, 3, 4, &ctrlpoints_center[0][0]);
   glEnable(GL_MAP1_VERTEX_3);
 }
 
@@ -62,12 +77,30 @@ void display(void) {
   for (i = 0; i <= 30; i++)
     glEvalCoord1f((GLfloat)i / 30.0);
   glEnd();
+
+  glMap1f(GL_MAP1_VERTEX_3, 0.0, 1.0, 3, 4, &ctrlpoints_left[0][0]);
+  glBegin(GL_LINE_STRIP);
+  for (i = 0; i <= 30; i++)
+    glEvalCoord1f((GLfloat)i / 30.0);
+  glEnd();
+
+  glMap1f(GL_MAP1_VERTEX_3, 0.0, 1.0, 3, 4, &ctrlpoints_right[0][0]);
+  glBegin(GL_LINE_STRIP);
+  for (i = 0; i <= 30; i++)
+    glEvalCoord1f((GLfloat)i / 30.0);
+  glEnd();
+
+  glMap1f(GL_MAP1_VERTEX_3, 0.0, 1.0, 3, 4, &ctrlpoints_center[0][0]);
+
   /* The following code displays the control points as dots. */
   glPointSize(5.0);
   glColor3f(1.0, 1.0, 0.0);
   glBegin(GL_POINTS);
-  for (i = 0; i < 4; i++)
-    glVertex3fv(&ctrlpoints[i][0]);
+  for (i = 0; i < 4; i++) {
+    glVertex3fv(&ctrlpoints_center[i][0]);
+    glVertex3fv(&ctrlpoints_left[i][0]);
+    glVertex3fv(&ctrlpoints_right[i][0]);
+  }
   glEnd();
   glFlush();
 }
